@@ -9,7 +9,7 @@ use chrono::{NaiveDateTime, Utc};
 use regex::Regex;
 
 
-const DEFAULT_LOG_PATH: &str = "/tmp/log.txt";
+const DEFAULT_LOG_PATH: &str = "/tmp/log.md";
 
 
 fn date() -> String {
