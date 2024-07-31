@@ -25,6 +25,7 @@ fn timestamp() -> String {
 }
 
 fn write_to_file(file_name: &str, log_string: &str) -> io::Result<usize> {
+
   let mut file = OpenOptions::new().append(true).create(true).open(file_name)?;
   file.write_all(log_string.as_bytes())?;
 
@@ -67,14 +68,20 @@ fn main() {
     }
 
     // We have a filepath, check if it is a new day because we need to handle the header
-    match last_line_of_file(file_path) {
+    let header = format!("# {}\n", date());
+    match last_line_of_file(file_path) {        
         Ok(line) => {
             if is_from_previous_day(&line) {
-                let header = format!("# {}\n", date());
                 let _ = write_to_file(file_path, header.as_str());
             }
         }
-        Err(e) => {eprintln!("Failed to get last line of file: {}", e);}
+        Err(e) => {
+            if e.kind() == io::ErrorKind::NotFound {
+                // Prime the file with the start of the log and the header
+                let _ = write_to_file(file_path, "# Log\n");
+                let _ = write_to_file(file_path, header.as_str());
+            }
+        }
     }
 
     let mut log_string: &str = "";
